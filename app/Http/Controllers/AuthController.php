@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Http\Requests\RegistroRequest;
 use Illuminate\Http\Request;
+use Laravel\Sanctum\HasApiTokens;
 
 class AuthController extends Controller
 {
@@ -16,7 +17,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'email' => bcrypt($data['password'])
+            'password' => bcrypt($data['password'])
         ]);
 
         // Retornar respuesta:
