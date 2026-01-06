@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use App\Http\Requests\RegistroRequest;
 use Illuminate\Http\Request;
@@ -27,7 +29,31 @@ class AuthController extends Controller
         ];
     }
 
-    public function login(Request $register) {}
+    public function login(LoginRequest $request) {
+        $data = $request->validated();
+        // Revisar el password:
+        if(!Auth::attempt($data)) {
+            return response([
+                'errors' => ['El email o el password son incorrectos.']
+            ], 422);
+        }
 
-    public function logout(Request $register) {}
+        // Autenticar:
+        $user = Auth::user();
+        return [
+            'token' => $user->createToken('token')->plainTextToken,
+            'user' => $user
+        ];
+
+
+    }
+
+    public function logout(Request $request) {
+        $user = $request->user();
+        $user->currentAccessToken()->delete();
+
+        return [
+            'user' => null
+        ];
+    }
 }
