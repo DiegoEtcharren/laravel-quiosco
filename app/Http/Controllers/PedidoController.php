@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pedido;
+use App\Models\PedidoProducto;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class PedidoController extends Controller
 {
@@ -27,8 +29,30 @@ class PedidoController extends Controller
         $pedido->total = $request->total;
         $pedido->save();
 
+        // Obtener ID del pedido agregado:
+        $id = $pedido->id;
+
+        // Obtener los productos:
+        $productos = $request->productos;
+
+        // Formatear arreglo con ids de productos y cantidades:
+        $pedido_producto = [];
+        foreach($productos as $producto) {
+            $pedido_producto[] = [
+                'pedido_id' => $id,
+                'producto_id' => $producto['id'],
+                'cantidad' => $producto['cantidad'],
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ];
+        }
+
+        // Almacenar en BD:
+        PedidoProducto::insert($pedido_producto);
+
+
         return [
-            'message' => 'Realizando pedido...'
+            'message' => 'Pedido Realizado correctamente'
         ];
     }
 
